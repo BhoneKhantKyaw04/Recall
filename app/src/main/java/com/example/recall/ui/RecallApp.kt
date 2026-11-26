@@ -40,7 +40,12 @@ fun RecallApp(container: AppContainer) {
                 onSettings = { navController.navigate(Routes.SETTINGS) }
             )
         }
-        composable(Routes.STUDY) { PlaceholderScreen("Practice") { navController.popBackStack() } }
+        composable(Routes.STUDY) {
+            StudyScreen(
+                viewModel = viewModel(factory = factory),
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable(Routes.STATS) { PlaceholderScreen("My progress") { navController.popBackStack() } }
         composable(Routes.SETTINGS) { PlaceholderScreen("Settings") { navController.popBackStack() } }
     }

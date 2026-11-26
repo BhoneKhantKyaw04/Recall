@@ -9,6 +9,8 @@ class RecallViewModelFactory(private val container: AppContainer) : ViewModelPro
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
         modelClass.isAssignableFrom(HomeViewModel::class.java) ->
             HomeViewModel(container.repository, container.settings)
+        modelClass.isAssignableFrom(StudyViewModel::class.java) ->
+            StudyViewModel(container.repository, container.settings)
         else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     } as T
 }
