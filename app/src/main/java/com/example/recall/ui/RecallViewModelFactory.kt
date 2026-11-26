@@ -12,7 +12,7 @@ class RecallViewModelFactory(private val container: AppContainer) : ViewModelPro
         modelClass.isAssignableFrom(StudyViewModel::class.java) ->
             StudyViewModel(container.repository, container.settings)
         modelClass.isAssignableFrom(SettingsViewModel::class.java) ->
-            SettingsViewModel(container.settings)
+            SettingsViewModel(container.settings, container.repository)
         else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     } as T
 }

@@ -29,7 +29,11 @@ interface FlashcardDao {
 
     @Query("SELECT COUNT(*) FROM flashcards")
     suspend fun count(): Int
+
+    @Query("SELECT question FROM flashcards")
+    suspend fun allQuestions(): List<String>
 }
+
 
 @Dao
 interface DailyStatDao {
@@ -44,4 +48,5 @@ interface DailyStatDao {
 
     @Query("SELECT * FROM daily_stats WHERE day = :day")
     fun observeDay(day: Long): Flow<DailyStat?>
+
 }
