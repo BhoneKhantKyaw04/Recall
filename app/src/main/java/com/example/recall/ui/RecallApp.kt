@@ -10,8 +10,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -30,24 +35,39 @@ object Routes {
 fun RecallApp(container: AppContainer) {
     val navController = rememberNavController()
     val factory = remember { RecallViewModelFactory(container) }
+    val settings by container.settings.settings.collectAsState()
+    val density = LocalDensity.current
 
-    NavHost(navController = navController, startDestination = Routes.HOME) {
-        composable(Routes.HOME) {
-            HomeScreen(
-                viewModel = viewModel(factory = factory),
-                onStudy = { navController.navigate(Routes.STUDY) },
-                onStats = { navController.navigate(Routes.STATS) },
-                onSettings = { navController.navigate(Routes.SETTINGS) }
-            )
+    // Apply the student's text size on top of the system font size
+    CompositionLocalProvider(
+        LocalDensity provides Density(density.density, density.fontScale * settings.textScale)
+    ) {
+        NavHost(navController = navController, startDestination = Routes.HOME) {
+            composable(Routes.HOME) {
+                HomeScreen(
+                    viewModel = viewModel(factory = factory),
+                    onStudy = { navController.navigate(Routes.STUDY) },
+                    onStats = { navController.navigate(Routes.STATS) },
+                    onSettings = { navController.navigate(Routes.SETTINGS) }
+                )
+            }
+            composable(Routes.STUDY) {
+                StudyScreen(
+                    viewModel = viewModel(factory = factory),
+                    soundOn = settings.soundOn,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Routes.STATS) {
+                PlaceholderScreen("My progress") { navController.popBackStack() }
+            }
+            composable(Routes.SETTINGS) {
+                SettingsScreen(
+                    viewModel = viewModel(factory = factory),
+                    onBack = { navController.popBackStack() }
+                )
+            }
         }
-        composable(Routes.STUDY) {
-            StudyScreen(
-                viewModel = viewModel(factory = factory),
-                onBack = { navController.popBackStack() }
-            )
-        }
-        composable(Routes.STATS) { PlaceholderScreen("My progress") { navController.popBackStack() } }
-        composable(Routes.SETTINGS) { PlaceholderScreen("Settings") { navController.popBackStack() } }
     }
 }
 

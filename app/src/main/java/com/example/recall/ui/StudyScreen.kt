@@ -22,10 +22,13 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import android.media.AudioManager
+import android.media.ToneGenerator
+import android.os.Handler
+import android.os.Looper
 
 @Composable
-fun StudyScreen(viewModel: StudyViewModel, onBack: () -> Unit) {
-    val state by viewModel.uiState.collectAsState()
+fun StudyScreen(viewModel: StudyViewModel, soundOn: Boolean, onBack: () -> Unit) {    val state by viewModel.uiState.collectAsState()
     val buttonModifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
 
     Scaffold { padding ->
@@ -75,11 +78,11 @@ fun StudyScreen(viewModel: StudyViewModel, onBack: () -> Unit) {
                     }
 
                     if (!state.showAnswer) {
-                        Button(onClick = viewModel::revealAnswer, modifier = buttonModifier) {
+                        Button(onClick = { if (soundOn) playTone(true); viewModel.answer(true) }) {
                             Text("Show answer")
                         }
                     } else {
-                        Button(onClick = { viewModel.answer(true) }, modifier = buttonModifier) {
+                        Button(onClick = { if (soundOn) playTone(false); viewModel.answer(false) }) {
                             Text("I knew it")
                         }
                         OutlinedButton(onClick = { viewModel.answer(false) }, modifier = buttonModifier) {
@@ -91,7 +94,16 @@ fun StudyScreen(viewModel: StudyViewModel, onBack: () -> Unit) {
                         Text("Finish for today")
                     }
                 }
+
             }
         }
     }
+}
+private fun playTone(correct: Boolean) {
+    val generator = ToneGenerator(AudioManager.STREAM_MUSIC, 50)
+    generator.startTone(
+        if (correct) ToneGenerator.TONE_PROP_ACK else ToneGenerator.TONE_PROP_PROMPT,
+        150
+    )
+    Handler(Looper.getMainLooper()).postDelayed({ generator.release() }, 400)
 }
