@@ -9,10 +9,18 @@ class RecallViewModelFactory(private val container: AppContainer) : ViewModelPro
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
         modelClass.isAssignableFrom(HomeViewModel::class.java) ->
             HomeViewModel(container.repository, container.settings)
-        modelClass.isAssignableFrom(StudyViewModel::class.java) ->
-            StudyViewModel(container.repository, container.settings)
         modelClass.isAssignableFrom(SettingsViewModel::class.java) ->
             SettingsViewModel(container.settings, container.repository)
         else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     } as T
+}
+
+/** Practice needs to know which deck to study, or null for a mix of everything. */
+class StudyViewModelFactory(
+    private val container: AppContainer,
+    private val deck: String?
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        StudyViewModel(container.repository, container.settings, deck) as T
 }

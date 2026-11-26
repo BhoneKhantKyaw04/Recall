@@ -1,5 +1,6 @@
 package com.example.recall.ui
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +20,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.recall.AppContainer
 
 object Routes {
@@ -29,6 +32,9 @@ object Routes {
     const val STUDY = "study"
     const val STATS = "stats"
     const val SETTINGS = "settings"
+
+    // "study" practises everything, "study?deck=Science" practises one deck
+    fun studyDeck(deck: String) = "$STUDY?deck=${Uri.encode(deck)}"
 }
 
 @Composable
@@ -47,13 +53,24 @@ fun RecallApp(container: AppContainer) {
                 HomeScreen(
                     viewModel = viewModel(factory = factory),
                     onStudy = { navController.navigate(Routes.STUDY) },
+                    onStudyDeck = { deck -> navController.navigate(Routes.studyDeck(deck)) },
                     onStats = { navController.navigate(Routes.STATS) },
                     onSettings = { navController.navigate(Routes.SETTINGS) }
                 )
             }
-            composable(Routes.STUDY) {
+            composable(
+                route = "${Routes.STUDY}?deck={deck}",
+                arguments = listOf(
+                    navArgument("deck") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { entry ->
+                val deck = entry.arguments?.getString("deck")
                 StudyScreen(
-                    viewModel = viewModel(factory = factory),
+                    viewModel = viewModel(factory = remember(deck) { StudyViewModelFactory(container, deck) }),
                     soundOn = settings.soundOn,
                     onBack = { navController.popBackStack() }
                 )

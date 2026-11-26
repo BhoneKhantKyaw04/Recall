@@ -23,8 +23,11 @@ class RecallRepository(
     fun dueCount(today: Long): Flow<Int> = cardDao.observeDueCount(today)
     fun statsForDay(day: Long): Flow<DailyStat?> = statDao.observeDay(day)
 
-    suspend fun getDueCards(today: Long, limit: Int): List<Flashcard> =
-        cardDao.getDueCards(today, limit)
+    suspend fun getDueCards(today: Long, limit: Int, deck: String? = null): List<Flashcard> =
+        if (deck == null) cardDao.getDueCards(today, limit)
+        else cardDao.getDueCardsForDeck(deck, today, limit)
+
+    fun dueByDeck(today: Long): Flow<List<DeckCount>> = cardDao.observeDueByDeck(today)
 
     suspend fun recordAnswer(card: Flashcard, correct: Boolean, today: Long) {
         cardDao.update(Scheduler.review(card, correct, today))

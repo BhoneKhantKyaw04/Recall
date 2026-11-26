@@ -13,7 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 data class HomeUiState(
     val dueCount: Int = 0,
     val studiedToday: Int = 0,
-    val dailyLimit: Int = 10
+    val dailyLimit: Int = 10,
+    val dueByDeck: Map<String, Int> = emptyMap()
 ) {
     val remaining: Int get() = maxOf(0, dailyLimit - studiedToday)
     val toStudy: Int get() = minOf(dueCount, remaining)
@@ -28,8 +29,14 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = combine(
         repository.dueCount(today),
         repository.statsForDay(today),
-        settingsRepository.settings
-    ) { due, stat, settings ->
-        HomeUiState(due, stat?.cardsStudied ?: 0, settings.dailyLimit)
+        settingsRepository.settings,
+        repository.dueByDeck(today)
+    ) { due, stat, settings, decks ->
+        HomeUiState(
+            dueCount = due,
+            studiedToday = stat?.cardsStudied ?: 0,
+            dailyLimit = settings.dailyLimit,
+            dueByDeck = decks.associate { it.deck to it.dueCount }
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 }

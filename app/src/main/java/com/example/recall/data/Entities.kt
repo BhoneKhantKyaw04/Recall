@@ -21,3 +21,5 @@ data class DailyStat(
     val cardsStudied: Int = 0,
     val correct: Int = 0
 )
+
+data class DeckCount(val deck: String, val dueCount: Int)

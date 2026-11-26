@@ -25,7 +25,8 @@ data class StudyUiState(
 
 class StudyViewModel(
     private val repository: RecallRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val deck: String?
 ) : ViewModel() {
 
     private val today = Scheduler.currentDay()
@@ -43,7 +44,7 @@ class StudyViewModel(
         val limit = settingsRepository.settings.value.dailyLimit
         val studiedToday = repository.statsForDay(today).first()?.cardsStudied ?: 0
         val remaining = maxOf(0, limit - studiedToday)
-        queue = repository.getDueCards(today, remaining)
+        queue = repository.getDueCards(today, remaining, deck)
         index = 0
         _uiState.value = StudyUiState(
             loading = false,

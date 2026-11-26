@@ -32,6 +32,12 @@ interface FlashcardDao {
 
     @Query("SELECT question FROM flashcards")
     suspend fun allQuestions(): List<String>
+
+    @Query("SELECT * FROM flashcards WHERE deck = :deck AND nextReviewDay <= :today ORDER BY box, id LIMIT :limit")
+    suspend fun getDueCardsForDeck(deck: String, today: Long, limit: Int): List<Flashcard>
+
+    @Query("SELECT deck, COUNT(*) AS dueCount FROM flashcards WHERE nextReviewDay <= :today GROUP BY deck")
+    fun observeDueByDeck(today: Long): Flow<List<DeckCount>>
 }
 
 
