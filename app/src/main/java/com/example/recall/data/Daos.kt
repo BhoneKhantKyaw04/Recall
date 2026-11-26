@@ -26,6 +26,9 @@ interface FlashcardDao {
 
     @Update
     suspend fun update(card: Flashcard)
+
+    @Query("SELECT COUNT(*) FROM flashcards")
+    suspend fun count(): Int
 }
 
 @Dao
@@ -38,4 +41,7 @@ interface DailyStatDao {
 
     @Query("SELECT * FROM daily_stats ORDER BY day DESC LIMIT 7")
     fun observeRecent(): Flow<List<DailyStat>>
+
+    @Query("SELECT * FROM daily_stats WHERE day = :day")
+    fun observeDay(day: Long): Flow<DailyStat?>
 }
