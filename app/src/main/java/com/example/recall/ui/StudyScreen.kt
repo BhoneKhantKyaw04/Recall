@@ -28,7 +28,8 @@ import android.os.Handler
 import android.os.Looper
 
 @Composable
-fun StudyScreen(viewModel: StudyViewModel, soundOn: Boolean, onBack: () -> Unit) {    val state by viewModel.uiState.collectAsState()
+fun StudyScreen(viewModel: StudyViewModel, soundOn: Boolean, onBack: () -> Unit) {
+    val state by viewModel.uiState.collectAsState()
     val buttonModifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
 
     Scaffold { padding ->
@@ -78,14 +79,20 @@ fun StudyScreen(viewModel: StudyViewModel, soundOn: Boolean, onBack: () -> Unit)
                     }
 
                     if (!state.showAnswer) {
-                        Button(onClick = { if (soundOn) playTone(true); viewModel.answer(true) }) {
+                        Button(onClick = viewModel::revealAnswer, modifier = buttonModifier) {
                             Text("Show answer")
                         }
                     } else {
-                        Button(onClick = { if (soundOn) playTone(false); viewModel.answer(false) }) {
+                        Button(
+                            onClick = { if (soundOn) playTone(true); viewModel.answer(true) },
+                            modifier = buttonModifier
+                        ) {
                             Text("I knew it")
                         }
-                        OutlinedButton(onClick = { viewModel.answer(false) }, modifier = buttonModifier) {
+                        OutlinedButton(
+                            onClick = { if (soundOn) playTone(false); viewModel.answer(false) },
+                            modifier = buttonModifier
+                        ) {
                             Text("Not yet")
                         }
                     }
