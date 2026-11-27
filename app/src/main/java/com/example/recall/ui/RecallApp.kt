@@ -76,7 +76,10 @@ fun RecallApp(container: AppContainer) {
                 )
             }
             composable(Routes.STATS) {
-                PlaceholderScreen("My progress") { navController.popBackStack() }
+                ProgressScreen(
+                    viewModel = viewModel(factory = factory),
+                    onBack = { navController.popBackStack() }
+                )
             }
             composable(Routes.SETTINGS) {
                 SettingsScreen(

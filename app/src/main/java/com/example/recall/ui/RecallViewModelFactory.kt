@@ -11,6 +11,8 @@ class RecallViewModelFactory(private val container: AppContainer) : ViewModelPro
             HomeViewModel(container.repository, container.settings)
         modelClass.isAssignableFrom(SettingsViewModel::class.java) ->
             SettingsViewModel(container.settings, container.repository)
+        modelClass.isAssignableFrom(ProgressViewModel::class.java) ->
+            ProgressViewModel(container.repository)
         else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     } as T
 }
